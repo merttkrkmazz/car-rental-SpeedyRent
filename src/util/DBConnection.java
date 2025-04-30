@@ -32,6 +32,13 @@ public class Srent_DB {
 
     }
 
+    public static String getDBName() {
+        return DB_NAME;
+    }
+
+
+
+
     /* checks if the user is exist or not */
     public static boolean authenticateUser(int userID, String password) {
         try {
@@ -99,15 +106,50 @@ public class Srent_DB {
             System.out.println("Error occured! \n");
         }
     }
+
     public static boolean addCar(Object carInfo){
         /******** what is car info **********/
     }
-    public static boolean updateCar(int carID, Object newInfo){}
-    public static boolean deleteCar(int carID){}
-    public static boolean checkAvailability(int carID){}
 
+    public static boolean updateCar(int carID, Object newInfo){
+        /******** what is newinfo **********/
+    }
+    public static boolean deleteCar(int carID){
+        try {
+            conn = getConnection();
+            String sql;
 
+            sql = "DELETE FROM car WHERE car_id = ? ";
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, carID);
+            ResultSet rs = ps.executeQuery();
+            conn.close();
 
+            return rs.next();
 
+        } catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("Error occured! \n");
+        }
+    }
+
+    public static boolean checkAvailability(int carID){
+        try {
+            conn = getConnection();
+            String sql;
+
+            sql = "SELECT * FROM car WHERE vehicle_status = ? ";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, "available");
+            ResultSet rs = ps.executeQuery();
+            conn.close();
+
+            return rs.next();
+
+        } catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("Error occured! \n");
+        }
+    }
 
 }

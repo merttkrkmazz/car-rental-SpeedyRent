@@ -119,9 +119,10 @@ public class Srent_DB {
             conn = getConnection();
             String sql;
 
-            sql = "DELETE FROM car WHERE car_id = ? ";
+            sql = "DELETE FROM car WHERE car_id = ? AND vehicle_status = ?";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, carID);
+            ps.setString(2, "available");
             ResultSet rs = ps.executeQuery();
             conn.close();
 

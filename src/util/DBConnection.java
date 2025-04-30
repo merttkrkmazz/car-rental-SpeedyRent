@@ -31,4 +31,17 @@ public class Srent_DB {
         }
 
     }
+
+    public static boolean authenticateUser(int userID, String password) {}
+    public static boolean reserveCar(int userID, int carID){}
+    public static boolean cancelReservation(int bookingID){}
+    public static boolean addCar(Object carInfo){}
+    public static boolean updateCar(int carID, Object newInfo){}
+    public static boolean deleteCar(int carID){}
+    public static boolean checkAvailability(int carID){}
+
+
+
+
+
 }

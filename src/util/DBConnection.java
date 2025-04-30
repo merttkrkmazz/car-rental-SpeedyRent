@@ -139,9 +139,9 @@ public class Srent_DB {
             conn = getConnection();
             String sql;
 
-            sql = "SELECT * FROM car WHERE vehicle_status = ? ";
+            sql = "SELECT vehicle_status FROM car WHERE car_id = ? ";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, "available");
+            ps.setInt(1, carID);
             ResultSet rs = ps.executeQuery();
             conn.close();
 

@@ -44,3 +44,6 @@ VALUES
 INSERT INTO reserves (booking_id, car_id) VALUES
   (1, 1),   -- booking 1  → car 1
   (2, 2);   -- booking 2  → car 2
+
+
+

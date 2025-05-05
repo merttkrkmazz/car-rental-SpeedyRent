@@ -4,8 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
-import db.Srent_DB;
+import util.Srent_DB;
 
 public class AuthenticationController {
 
@@ -48,12 +49,8 @@ public class AuthenticationController {
                         System.out.println("User exists but has no role.");
                         return UserRole.UNKNOWN;
                     }
-                } catch (SQLException roleEx) {
-                    System.err.println("SQL error while checking role: " + roleEx.getMessage());
-                    roleEx.printStackTrace();
-                    return UserRole.UNKNOWN;
                 } catch (Exception roleEx) {
-                    System.err.println("General error while checking role: " + roleEx.getMessage());
+                    System.err.println("Error while checking role: " + roleEx.getMessage());
                     roleEx.printStackTrace();
                     return UserRole.UNKNOWN;
                 }
@@ -73,21 +70,9 @@ public class AuthenticationController {
             return UserRole.UNKNOWN;
 
         } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close ResultSet: " + e.getMessage());
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close PreparedStatement: " + e.getMessage());
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close Connection: " + e.getMessage());
-            }
+            try { if (rs != null) rs.close(); } catch (Exception e) { System.err.println("Failed to close ResultSet: " + e.getMessage()); }
+            try { if (ps != null) ps.close(); } catch (Exception e) { System.err.println("Failed to close PreparedStatement: " + e.getMessage()); }
+            try { if (conn != null) conn.close(); } catch (Exception e) { System.err.println("Failed to close Connection: " + e.getMessage()); }
         }
     }
 
@@ -116,16 +101,8 @@ public class AuthenticationController {
             return false;
 
         } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close ResultSet in isAdmin(): " + e.getMessage());
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close PreparedStatement in isAdmin(): " + e.getMessage());
-            }
+            try { if (rs != null) rs.close(); } catch (Exception e) { System.err.println("Failed to close ResultSet in isAdmin(): " + e.getMessage()); }
+            try { if (ps != null) ps.close(); } catch (Exception e) { System.err.println("Failed to close PreparedStatement in isAdmin(): " + e.getMessage()); }
         }
     }
 
@@ -154,16 +131,8 @@ public class AuthenticationController {
             return false;
 
         } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close ResultSet in isCustomer(): " + e.getMessage());
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close PreparedStatement in isCustomer(): " + e.getMessage());
-            }
+            try { if (rs != null) rs.close(); } catch (Exception e) { System.err.println("Failed to close ResultSet in isCustomer(): " + e.getMessage()); }
+            try { if (ps != null) ps.close(); } catch (Exception e) { System.err.println("Failed to close PreparedStatement in isCustomer(): " + e.getMessage()); }
         }
     }
 
@@ -238,37 +207,12 @@ public class AuthenticationController {
             return false;
 
         } finally {
-            // Kaynakları sırayla kapat
-            try {
-                if (rs != null) rs.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close ResultSet: " + e.getMessage());
-            }
-            try {
-                if (checkEmailStmt != null) checkEmailStmt.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close checkEmailStmt: " + e.getMessage());
-            }
-            try {
-                if (insertUserStmt != null) insertUserStmt.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close insertUserStmt: " + e.getMessage());
-            }
-            try {
-                if (getIdStmt != null) getIdStmt.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close getIdStmt: " + e.getMessage());
-            }
-            try {
-                if (insertCustomerStmt != null) insertCustomerStmt.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close insertCustomerStmt: " + e.getMessage());
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (Exception e) {
-                System.err.println("Failed to close Connection: " + e.getMessage());
-            }
+            try { if (rs != null) rs.close(); } catch (Exception e) { System.err.println("Failed to close ResultSet: " + e.getMessage()); }
+            try { if (checkEmailStmt != null) checkEmailStmt.close(); } catch (Exception e) { System.err.println("Failed to close checkEmailStmt: " + e.getMessage()); }
+            try { if (insertUserStmt != null) insertUserStmt.close(); } catch (Exception e) { System.err.println("Failed to close insertUserStmt: " + e.getMessage()); }
+            try { if (getIdStmt != null) getIdStmt.close(); } catch (Exception e) { System.err.println("Failed to close getIdStmt: " + e.getMessage()); }
+            try { if (insertCustomerStmt != null) insertCustomerStmt.close(); } catch (Exception e) { System.err.println("Failed to close insertCustomerStmt: " + e.getMessage()); }
+            try { if (conn != null) conn.close(); } catch (Exception e) { System.err.println("Failed to close Connection: " + e.getMessage()); }
         }
     }
 
@@ -337,8 +281,4 @@ public class AuthenticationController {
             return false;
         }
     }
-
-
-
-
 }

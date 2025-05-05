@@ -1,6 +1,6 @@
 package controller;
 
-import db.Srent_DB;
+import util.Srent_DB;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -1,5 +1,6 @@
 package controller;
 
+import model.Car;
 import util.Srent_DB;
 
 import java.sql.*;
@@ -229,6 +230,35 @@ public class CarController {
         }
         return cars;
     }
+
+    public static List<Car> getAvailableCarsAsObjects() {
+        List<Car> cars = new ArrayList<>();
+        String sql = "SELECT c.car_id, c.model, c.daily_rent, vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
+                "FROM Car c " +
+                "JOIN has h ON c.car_id = h.car_id " +
+                "JOIN VehicleSpecification vs ON h.specification_id = vs.specification_id " +
+                "WHERE c.vehicle_status = 'available'";
+        try (Connection conn = Srent_DB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Car car = new Car(
+                        rs.getInt("car_id"),
+                        "Unknown", // brand kolonu veritabanında yoksa placeholder
+                        rs.getString("model"),
+                        rs.getString("fuel_type"),
+                        rs.getString("transmission_type"),
+                        rs.getInt("seating_capacity"),
+                        rs.getDouble("daily_rent")
+                );
+                cars.add(car);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cars;
+    }
+
 
     public static List<String> getCarsByStatus(String status) {
         List<String> cars = new ArrayList<>();

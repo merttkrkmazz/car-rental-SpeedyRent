@@ -1,6 +1,5 @@
 package view;
 
-import app.Main;
 import controller.CarController;
 import model.Car;
 
@@ -11,8 +10,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CarListPanel extends JPanel {
+    private final CardLayout cardLayout;
+    private final JPanel container;
+
     private JTable carTable;
-    private CarController carController;
     private JComboBox<String> fuelFilterBox;
     private JComboBox<String> transmissionFilterBox;
     private JComboBox<String> sortBox;
@@ -20,14 +21,16 @@ public class CarListPanel extends JPanel {
 
     private List<Car> allCars;
 
-    public CarListPanel() {
-        this.carController = new CarController();
+    public CarListPanel(CardLayout cardLayout, JPanel container) {
+        this.cardLayout = cardLayout;
+        this.container = container;
+
         setLayout(new BorderLayout());
 
-        // === ÜST: Filtre ve Sıralama ===
+        // === ÜST Panel: Filtre/Sıralama ===
         JPanel topPanel = new JPanel(new FlowLayout());
 
-        fuelFilterBox = new JComboBox<>(new String[]{"All", "Gasoline", "Diesel", "Electric"});
+        fuelFilterBox = new JComboBox<>(new String[]{"All", "Gasoline", "Diesel", "Electric", "Hybrid"});
         transmissionFilterBox = new JComboBox<>(new String[]{"All", "Automatic", "Manual"});
         sortBox = new JComboBox<>(new String[]{"Sort by Price ↑", "Sort by Price ↓"});
 
@@ -39,16 +42,16 @@ public class CarListPanel extends JPanel {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // === ORTA: Araç Tablosu ===
-        String[] columns = {"ID", "Brand", "Model", "Fuel", "Transmission", "Seats", "Price"};
+        // === ORTA Panel: Tablo ===
+        String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Price"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
         carTable = new JTable(tableModel);
         carTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         add(new JScrollPane(carTable), BorderLayout.CENTER);
 
-        // === ALT: Kirala Butonu ===
+        // === ALT Panel: Kirala butonu ===
         rentButton = new JButton("Kirala");
-        JPanel bottomPanel = new JPanel();
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(rentButton);
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -58,13 +61,13 @@ public class CarListPanel extends JPanel {
         sortBox.addActionListener(e -> applyFilters());
         rentButton.addActionListener(e -> onRentButton());
 
-        // === Veri Yükle ===
+        // === Verileri Yükle ===
         loadCars();
     }
 
     private void loadCars() {
-        allCars = carController.getAvailableCars(); // veritabanından tam liste
-        applyFilters(); // filtre uygulanmış listeyi göster
+        allCars = CarController.getAvailableCarsAsObjects();  // List<Car> bekliyor
+        applyFilters();
     }
 
     private void applyFilters() {
@@ -83,13 +86,17 @@ public class CarListPanel extends JPanel {
             filtered.sort((a, b) -> Double.compare(b.getRentalPrice(), a.getRentalPrice()));
         }
 
-        // tabloyu güncelle
         DefaultTableModel model = (DefaultTableModel) carTable.getModel();
         model.setRowCount(0);
+
         for (Car car : filtered) {
             model.addRow(new Object[]{
-                    car.getId(), car.getBrand(), car.getModel(), car.getFuelType(),
-                    car.getTransmission(), car.getSeatingCapacity(), car.getRentalPrice()
+                    car.getId(),
+                    car.getModel(),
+                    car.getFuelType(),
+                    car.getTransmission(),
+                    car.getSeatingCapacity(),
+                    car.getRentalPrice()
             });
         }
     }
@@ -102,15 +109,15 @@ public class CarListPanel extends JPanel {
         }
 
         int carId = (int) carTable.getValueAt(selectedRow, 0);
-        Car selectedCar = allCars.stream().filter(c -> c.getId() == carId).findFirst().orElse(null);
+        Car selectedCar = allCars.stream()
+                .filter(c -> c.getId() == carId)
+                .findFirst()
+                .orElse(null);
 
         if (selectedCar != null) {
-            // Panel geçişi
-            JFrame topFrame = Main.frame; // app.Main.java'dan frame referansı al
-            topFrame.setContentPane(new BookingPanel(selectedCar));
-            topFrame.revalidate();
-            topFrame.repaint();
+            BookingPanel bookingPanel = new BookingPanel(cardLayout, container);  // Seçilen araç bu panelde kullanılabilir
+            container.add(bookingPanel, "booking");
+            cardLayout.show(container, "booking");
         }
     }
-
 }

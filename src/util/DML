@@ -1,0 +1,49 @@
+INSERT INTO user (user_id, gender, email, address, created_at, first_name, last_name, username)
+VALUES
+  (1, 'M', 'john.doe@example.com',  '221B Baker St, London',        NOW(), 'John',  'Doe',   'jdoe'),
+  (2, 'F', 'ayse.kara@example.com', 'İstiklal Cd. No:12, İstanbul', NOW(), 'Ayşe',  'Kara',  'akar'),
+  (3, 'M', 'li.wang@example.com',   '88 Nanjing Rd, Shanghai',      NOW(), 'Li',    'Wang',  'lwang');
+INSERT INTO customer (user_id, occupation)
+VALUES
+  (1, 'Fütürist'),
+  (2, 'Düşünür'),
+  (3, 'Çapulcu');
+INSERT INTO booking
+        (start_date,  end_date,   secure_deposit, amount, drive_option, reading, date_out)
+/* id is AUTO_INCREMENT */
+VALUES  ('2025-05-01','2025-05-07', 500.00,        1200.00,'self',      45500,   '2025-05-01'),
+        ('2025-06-12','2025-06-14', 250.00,        4500.00,'chauffeur',  72210,   '2025-06-12'),
+        ('2025-07-20','2025-07-27', 800.00,        1900.00,'self',      NULL,    NULL);
+
+/* -------- INSERT : hangi kullanıcı hangi booking’i yaptı -------- */
+INSERT INTO makes (user_id, booking_id) VALUES      -- PK = (user_id, booking_id)
+  (1, 1),   -- user 1   → booking 1
+  (1, 3),   -- user 1   → booking 3
+  (2, 2);   -- user 2   → booking 2
+/* ---------- INSERT sample bookings ---------- */
+
+/* ---------- INSERT sample cars ---------- */
+INSERT INTO car (model, daily_rent, deposit, mileage, vehicle_status)
+VALUES
+  ('Toyota Corolla 1.6',          45.00,  500.00,  45500, 'available'),
+  ('Honda Civic 1.5 Turbo',       52.00,  500.00,  38200, 'available'),
+  ('Hyundai i20 1.4',             35.00,  350.00,  61700, 'available'),
+  ('Volkswagen Golf 1.4 TSI',     55.00,  600.00,  50150, 'rented'),
+  ('Ford Focus 1.6',              46.00,  500.00,  72430, 'service'),
+  ('Renault Clio 1.2',            32.00,  300.00,  85910, 'available'),
+  ('BMW 320i',                    95.00,  800.00,  72210, 'service'),
+  ('Mercedes-Benz C200',         110.00,  900.00,  64880, 'available'),
+  ('Audi A3 1.4 TFSI',            88.00,  800.00,  59310, 'available'),
+  ('Peugeot 3008 1.5 dCi',        70.00,  650.00,  41225, 'rented'),
+  ('Nissan Qashqai 1.3',          68.00,  650.00,  47980, 'available'),
+  ('Tesla Model 3 SR+',          120.00,  900.00,  12000, 'rented'),
+  ('Volvo XC60 B4',              130.00, 1000.00,  27350, 'available'),
+  ('Fiat Egea 1.6 MultiJet',      40.00,  400.00,  93100, 'retired'),
+  ('Citroën C-Elysée 1.2',        34.00,  300.00, 101640, 'available');
+
+INSERT INTO reserves (booking_id, car_id) VALUES
+  (1, 1),   -- booking 1  → car 1
+  (2, 2);   -- booking 2  → car 2
+
+
+

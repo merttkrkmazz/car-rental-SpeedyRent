@@ -8,8 +8,10 @@ public class Car {
     private String transmission;
     private int seatingCapacity;
     private double rentalPrice;
+    private String availability;
 
-    public Car(int id, String brand, String model, String fuelType, String transmission, int seatingCapacity, double rentalPrice) {
+
+    public Car(int id, String brand, String model, String fuelType, String transmission, int seatingCapacity, double rentalPrice, String availability) {
         this.id = id;
         this.brand = brand;
         this.model = model;
@@ -17,6 +19,8 @@ public class Car {
         this.transmission = transmission;
         this.seatingCapacity = seatingCapacity;
         this.rentalPrice = rentalPrice;
+        this.availability = availability;
+
     }
 
     public int getId() { return id; }
@@ -26,4 +30,5 @@ public class Car {
     public String getTransmission() { return transmission; }
     public int getSeatingCapacity() { return seatingCapacity; }
     public double getRentalPrice() { return rentalPrice; }
+    public String getAvailability() { return availability;}
 }

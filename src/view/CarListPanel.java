@@ -43,7 +43,7 @@ public class CarListPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         // === ORTA Panel: Tablo ===
-        String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Price"};
+        String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Price", "Status"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
         carTable = new JTable(tableModel);
         carTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -96,7 +96,8 @@ public class CarListPanel extends JPanel {
                     car.getFuelType(),
                     car.getTransmission(),
                     car.getSeatingCapacity(),
-                    car.getRentalPrice()
+                    car.getRentalPrice(),
+                    car.getAvailability() // ✅ Eklenen satır
             });
         }
     }

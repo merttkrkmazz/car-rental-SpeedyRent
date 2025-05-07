@@ -14,7 +14,7 @@ public class Srent_DB {
     private static String HOST_NAME = "127.0.0.1";
     private static final String PORT = "3306";               // mysql use this port(default)
     private static final String USER_NAME = "root";          // admin name: root
-    private static final String PASSWORD = "123";     // admin pwd
+    private static final String PASSWORD = "1234";     // admin pwd
     private static final String DB_NAME = "srent";
 
     public static Connection getConnection() {
@@ -81,51 +81,6 @@ public class Srent_DB {
             String sql = "DELETE FROM reservations WHERE booking_id = ?";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, bookingID);
-            ResultSet rs = ps.executeQuery();
-            conn.close();
-            return rs.next();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Error occured! \n");
-            return false;
-        }
-    }
-
-    public static boolean addCar(Object carInfo) {
-        /******** what is car info **********/
-        return false;
-    }
-
-    public static boolean updateCar(int carID, Object newInfo) {
-        /******** what is newinfo **********/
-        return false;
-    }
-
-    public static boolean deleteCar(int carID) {
-        try {
-            conn = getConnection();
-            String sql = "DELETE FROM car WHERE car_id = ? AND vehicle_status = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, carID);
-            ps.setString(2, "available");
-            ResultSet rs = ps.executeQuery();
-            conn.close();
-            return rs.next();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Error occured! \n");
-            return false;
-        }
-    }
-
-    public static boolean checkAvailability(int carID) {
-        try {
-            conn = getConnection();
-            String sql = "SELECT vehicle_status FROM car WHERE car_id = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, carID);
             ResultSet rs = ps.executeQuery();
             conn.close();
             return rs.next();

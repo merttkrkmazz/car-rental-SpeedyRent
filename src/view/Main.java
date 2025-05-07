@@ -27,18 +27,20 @@ public class Main {
             LoginPanel loginPanel = new LoginPanel(cardLayout, container);
             BookingPanel bookingPanel = new BookingPanel(cardLayout, container);
             CarListPanel carListPanel = new CarListPanel(cardLayout, container);
+            AdminPanel adminPanel = new AdminPanel(cardLayout, container);  // ✅ YENİ
 
             // === Panellerin karta eklenmesi ===
             container.add(loginPanel, "login");
             container.add(bookingPanel, "booking");
             container.add(carListPanel, "carlist");
+            container.add(adminPanel, "admin");  // ✅ YENİ
 
             // === Pencereye yerleştirme ===
             frame.setContentPane(container);
             frame.setVisible(true);
 
-            // İlk açılışta login ekranı göster
-            cardLayout.show(container, "login");
+            // Başlangıç ekranı
+            cardLayout.show(container, "login"); // İsteğe göre "admin" de olabilir
         });
     }
 }

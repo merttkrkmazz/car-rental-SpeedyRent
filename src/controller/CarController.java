@@ -55,16 +55,14 @@ public class CarController {
         }
     }
 
-    public static boolean updateCar(int carId, String model, double dailyRent, double deposit, int mileage, String status) {
-        String sql = "UPDATE Car SET model = ?, daily_rent = ?, deposit = ?, mileage = ?, vehicle_status = ? WHERE car_id = ?";
+    public static boolean updateCar(int carId, String model, double dailyRent, String status) {
+        String sql = "UPDATE Car SET model = ?, daily_rent = ?, vehicle_status = ? WHERE car_id = ?";
         try (Connection conn = Srent_DB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, model);
             ps.setDouble(2, dailyRent);
-            ps.setDouble(3, deposit);
-            ps.setInt(4, mileage);
-            ps.setString(5, status);
-            ps.setInt(6, carId);
+            ps.setString(3, status);
+            ps.setInt(4, carId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -99,33 +97,63 @@ public class CarController {
     }
 
     public static boolean deleteCar(int carId) {
-        String checkSql = "SELECT vehicle_status FROM Car WHERE car_id = ?";
-        String deleteSql = "DELETE FROM Car WHERE car_id = ?";
-        try (Connection conn = Srent_DB.getConnection();
-             PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+        String deleteHasSql      = "DELETE FROM has WHERE car_id = ?";
+        String deleteReservesSql = "DELETE FROM reserves WHERE car_id = ?";
+        String deleteManagesSql  = "DELETE FROM manages WHERE car_id = ?";
+        String deleteCarSql      = "DELETE FROM Car WHERE car_id = ?";
 
-            checkPs.setInt(1, carId);
-            ResultSet rs = checkPs.executeQuery();
-            if (rs.next()) {
-                String status = rs.getString("vehicle_status");
-                if (!"available".equals(status)) {
-                    System.out.println("Only available cars can be deleted.");
-                    return false;
-                }
-            } else {
-                System.out.println("Car not found.");
-                return false;
+        try (Connection conn = Srent_DB.getConnection()) {
+            conn.setAutoCommit(false);
+
+            // 1) Remove specs links
+            try (PreparedStatement ps = conn.prepareStatement(deleteHasSql)) {
+                ps.setInt(1, carId);
+                ps.executeUpdate();
             }
 
-            try (PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
-                deletePs.setInt(1, carId);
-                return deletePs.executeUpdate() > 0;
+            // 2) Remove any reservations
+            try (PreparedStatement ps = conn.prepareStatement(deleteReservesSql)) {
+                ps.setInt(1, carId);
+                ps.executeUpdate();
             }
+
+            // 3) Remove any admin‐car link (if you have one)
+            try (PreparedStatement ps = conn.prepareStatement(deleteManagesSql)) {
+                ps.setInt(1, carId);
+                ps.executeUpdate();
+            }
+
+            // 4) Finally delete the car itself
+            int affected;
+            try (PreparedStatement ps = conn.prepareStatement(deleteCarSql)) {
+                ps.setInt(1, carId);
+                affected = ps.executeUpdate();
+            }
+
+            conn.commit();
+            return affected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
+
+    public static int getSpecificationIdForCar(int carId) {
+        String sql = "SELECT specification_id FROM has WHERE car_id = ?";
+        try (Connection conn = Srent_DB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, carId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("specification_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
 
     public static String getCarById(int carId) {
         String sql = "SELECT c.model, c.daily_rent, c.deposit, c.mileage, c.vehicle_status, vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
@@ -210,6 +238,35 @@ public class CarController {
         }
         return cars;
     }
+    public static List<Car> getAllCarsAsObjects() {
+        List<Car> cars = new ArrayList<>();
+        String sql =
+                "SELECT c.car_id, c.model, c.daily_rent, c.vehicle_status, " +
+                        "       vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
+                        "  FROM Car c " +
+                        "  JOIN has h ON c.car_id = h.car_id " +
+                        "  JOIN VehicleSpecification vs ON h.specification_id = vs.specification_id";
+        try (Connection conn = Srent_DB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                cars.add(new Car(
+                        rs.getInt("car_id"),
+                        "Unknown",                       // placeholder brand
+                        rs.getString("model"),
+                        rs.getString("fuel_type"),
+                        rs.getString("transmission_type"),
+                        rs.getInt("seating_capacity"),
+                        rs.getDouble("daily_rent"),
+                        rs.getString("vehicle_status")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cars;
+    }
 
     public static List<String> getAllAvailableCars() {
         List<String> cars = new ArrayList<>();
@@ -233,25 +290,28 @@ public class CarController {
 
     public static List<Car> getAvailableCarsAsObjects() {
         List<Car> cars = new ArrayList<>();
-        String sql = "SELECT c.car_id, c.model, c.daily_rent, vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
-                "FROM Car c " +
-                "JOIN has h ON c.car_id = h.car_id " +
-                "JOIN VehicleSpecification vs ON h.specification_id = vs.specification_id " +
-                "WHERE c.vehicle_status = 'available'";
+        String sql =
+                "SELECT c.car_id, c.model, c.daily_rent, c.vehicle_status, " +
+                        "       vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
+                        "  FROM Car c " +
+                        "  JOIN has h ON c.car_id = h.car_id " +
+                        "  JOIN VehicleSpecification vs ON h.specification_id = vs.specification_id " +
+                        " WHERE c.vehicle_status = 'available'";
         try (Connection conn = Srent_DB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
-                Car car = new Car(
+                cars.add(new Car(
                         rs.getInt("car_id"),
-                        "Unknown", // brand kolonu veritabanında yoksa placeholder
+                        "Unknown",                       // placeholder for brand
                         rs.getString("model"),
                         rs.getString("fuel_type"),
                         rs.getString("transmission_type"),
                         rs.getInt("seating_capacity"),
-                        rs.getDouble("daily_rent")
-                );
-                cars.add(car);
+                        rs.getDouble("daily_rent"),
+                        rs.getString("vehicle_status")
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();

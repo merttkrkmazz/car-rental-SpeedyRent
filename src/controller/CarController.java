@@ -1,11 +1,10 @@
 package controller;
 
-import model.Car;
-import util.Srent_DB;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Car;
+import util.Srent_DB;
 
 public class CarController {
 
@@ -83,12 +82,12 @@ public class CarController {
         }
     }
 
-    public static boolean assignCarToAdmin(int adminId, int carId) {
-        String sql = "INSERT INTO manages (user_id, car_id) VALUES (?, ?)";
+    public static boolean removeSpecificationFromCar(int carId, int specId) {
+        String sql = "DELETE FROM has WHERE car_id = ? AND specification_id = ?";
         try (Connection conn = Srent_DB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, adminId);
-            ps.setInt(2, carId);
+            ps.setInt(1, carId);
+            ps.setInt(2, specId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

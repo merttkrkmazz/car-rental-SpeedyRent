@@ -88,7 +88,7 @@ public class AdminPanel extends JPanel {
                     car.getTransmission(),
                     car.getSeatingCapacity(),
                     car.getRentalPrice(),
-                    car.getAvailability()
+                    car.isAvailable()
             });
         }
     }

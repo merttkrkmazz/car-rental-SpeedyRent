@@ -1,4 +1,4 @@
-package service;
+package service.impl;
 
 import dao.CarDAO;
 import model.Car;
@@ -31,4 +31,3 @@ public class CarFilterManager {
                 .collect(Collectors.toList());
     }
 }
-+

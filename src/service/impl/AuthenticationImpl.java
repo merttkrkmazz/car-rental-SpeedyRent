@@ -1,9 +1,10 @@
-package service;
+package service.impl;
 
+import service.interfaces.Authentication;
 import dao.UserDAO;
 import model.User;
 
-public class AuthenticationImpl implements AuthenticationService {
+public class AuthenticationImpl implements Authentication {
     private final UserDAO userDAO;
 
     public AuthenticationImpl(UserDAO userDAO) {

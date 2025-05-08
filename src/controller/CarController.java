@@ -251,14 +251,15 @@ public class CarController {
 
             while (rs.next()) {
                 cars.add(new Car(
-                        rs.getInt("car_id"),
-                        "Unknown",                       // placeholder brand
-                        rs.getString("model"),
-                        rs.getString("fuel_type"),
-                        rs.getString("transmission_type"),
-                        rs.getInt("seating_capacity"),
-                        rs.getDouble("daily_rent"),
-                        rs.getString("vehicle_status")
+                    rs.getInt("car_id"),
+                    "Unknown",                                // placeholder brand
+                    rs.getString("model"),
+                    rs.getString("color"),                    // artık ok
+                    rs.getString("fuel_type"),
+                    rs.getString("transmission_type"),
+                    rs.getInt("seating_capacity"),
+                    rs.getDouble("daily_rent"),
+                    "available".equalsIgnoreCase(rs.getString("vehicle_status"))  // boolean param
                 ));
             }
         } catch (SQLException e) {
@@ -302,14 +303,15 @@ public class CarController {
 
             while (rs.next()) {
                 cars.add(new Car(
-                        rs.getInt("car_id"),
-                        "Unknown",                       // placeholder for brand
-                        rs.getString("model"),
-                        rs.getString("fuel_type"),
-                        rs.getString("transmission_type"),
-                        rs.getInt("seating_capacity"),
-                        rs.getDouble("daily_rent"),
-                        rs.getString("vehicle_status")
+                    rs.getInt("car_id"),
+                    "Unknown",
+                    rs.getString("model"),
+                    rs.getString("color"),
+                    rs.getString("fuel_type"),
+                    rs.getString("transmission_type"),
+                    rs.getInt("seating_capacity"),
+                    rs.getDouble("daily_rent"),
+                    true  // zaten yalnızca available seçiliyor
                 ));
             }
         } catch (SQLException e) {

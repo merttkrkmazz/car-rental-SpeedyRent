@@ -1,11 +1,12 @@
 /* ---------- base user ---------- */
 CREATE TABLE User (
     user_id       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name          VARCHAR(60) NOT NULL,
+    first_name    VARCHAR(30),
+    last_name     VARCHAR(30),
+    username      VARCHAR(30) UNIQUE,
     gender        ENUM('F','M','X') DEFAULT NULL,
     email         VARCHAR(120) UNIQUE,
     address       VARCHAR(150),
-    /* common columns … */
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 

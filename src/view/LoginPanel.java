@@ -1,9 +1,9 @@
 package view;
 
-import javax.swing.*;
-import java.awt.*;
 import controller.AuthenticationController;
 import controller.AuthenticationController.UserRole;
+import java.awt.*;
+import javax.swing.*;
 
 /**
  * Giriş ekranı. Kullanıcı ID ve isim ile login olur.
@@ -22,7 +22,6 @@ public class LoginPanel extends JPanel {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Başlık
         JLabel title = new JLabel("SpeedyRent Login", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
@@ -31,7 +30,6 @@ public class LoginPanel extends JPanel {
         add(title, gbc);
 
         gbc.gridwidth = 1;
-        // User ID
         gbc.gridy = 1;
         gbc.gridx = 0;
         add(new JLabel("User ID:"), gbc);
@@ -39,7 +37,6 @@ public class LoginPanel extends JPanel {
         gbc.gridx = 1;
         add(userIdField, gbc);
 
-        // Name
         gbc.gridy = 2;
         gbc.gridx = 0;
         add(new JLabel("Name:"), gbc);
@@ -47,7 +44,6 @@ public class LoginPanel extends JPanel {
         gbc.gridx = 1;
         add(nameField, gbc);
 
-        // Login butonu
         JButton loginButton = new JButton("Login");
         gbc.gridy = 3;
         gbc.gridx = 0;
@@ -70,7 +66,7 @@ public class LoginPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+    
         UserRole role = AuthenticationController.login(userId, name);
         if (role == UserRole.UNKNOWN) {
             JOptionPane.showMessageDialog(this,
@@ -82,7 +78,13 @@ public class LoginPanel extends JPanel {
                     "Login successful: " + role,
                     "Welcome",
                     JOptionPane.INFORMATION_MESSAGE);
-            cardLayout.show(container, "booking");
+            
+            if (role == UserRole.ADMIN) {
+                cardLayout.show(container, "admin");
+            } else if (role == UserRole.CUSTOMER) {
+                cardLayout.show(container, "carlist");
+            }
         }
     }
+    
 }

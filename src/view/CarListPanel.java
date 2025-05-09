@@ -43,7 +43,7 @@ public class CarListPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         // === ORTA Panel: Tablo ===
-        String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Price", "Status"};
+        String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Color", "Price", "Status"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
         carTable = new JTable(tableModel);
         carTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -90,10 +90,10 @@ public class CarListPanel extends JPanel {
         m.setRowCount(0);
         for (Car c : filtered) {
             m.addRow(new Object[]{
-                c.getId(), c.getModel(),
-                c.getFuelType(), c.getTransmission(),
-                c.getSeatingCapacity(), c.getRentalPrice(),
-                c.isAvailable()
+                    c.getId(), c.getModel(),
+                    c.getFuelType(), c.getTransmission(),
+                    c.getSeatingCapacity(), c.getColor(),
+                    c.getRentalPrice(), c.isAvailable()
             });
         }
     }

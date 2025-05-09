@@ -1,4 +1,23 @@
+-- Önce ilişki (bridge) tabloları silinir
+DROP TABLE IF EXISTS reserves;
+DROP TABLE IF EXISTS makes;
+DROP TABLE IF EXISTS brings;
+DROP TABLE IF EXISTS has;
+DROP TABLE IF EXISTS manages;
+
+-- Ardından ana tablolar (bağımlı olanlar)
+DROP TABLE IF EXISTS Booking;
+DROP TABLE IF EXISTS Car;
+DROP TABLE IF EXISTS VehicleSpecification;
+DROP TABLE IF EXISTS Card;
+DROP TABLE IF EXISTS Admin;
+DROP TABLE IF EXISTS Customer;
+DROP TABLE IF EXISTS User;
+
+
 /* ---------- base user ---------- */
+DROP TABLE IF EXISTS User;
+
 CREATE TABLE User (
     user_id       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     first_name    VARCHAR(30),
@@ -9,6 +28,7 @@ CREATE TABLE User (
     address       VARCHAR(150),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
 
 /* ---- role-specific sub-tables (ISA) ---------------------- */
 CREATE TABLE Admin (
@@ -48,7 +68,7 @@ CREATE TABLE Car (
 CREATE TABLE VehicleSpecification (
     specification_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     color            VARCHAR(20),
-    fuel_type        ENUM('petrol','diesel','hybrid','ev'),
+    fuel_type        ENUM('petrol','diesel','hybrid','gasoline'),
     transmission_type ENUM('automatic','manual'),
     seating_capacity TINYINT UNSIGNED
 ) ENGINE=InnoDB;

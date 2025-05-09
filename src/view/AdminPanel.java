@@ -9,8 +9,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-// === imports aynı ===
-
 public class AdminPanel extends JPanel {
     private final CardLayout cardLayout;
     private final JPanel container;
@@ -27,7 +25,7 @@ public class AdminPanel extends JPanel {
 
         setLayout(new BorderLayout());
 
-        // === ÜST Panel: Form alanları ===
+        // === Top Panel: Form Fields ===
         JPanel formPanel = new JPanel(new GridLayout(2, 7, 5, 5));
 
         modelField = new JTextField();
@@ -39,11 +37,11 @@ public class AdminPanel extends JPanel {
 
         formPanel.add(new JLabel("Model:"));
         formPanel.add(modelField);
-        formPanel.add(new JLabel("Rent:"));
+        formPanel.add(new JLabel("Rent per Day:"));
         formPanel.add(rentField);
         formPanel.add(new JLabel("Seats:"));
         formPanel.add(seatField);
-        formPanel.add(new JLabel("Fuel:"));
+        formPanel.add(new JLabel("Fuel Type:"));
         formPanel.add(fuelBox);
         formPanel.add(new JLabel("Transmission:"));
         formPanel.add(transBox);
@@ -52,25 +50,25 @@ public class AdminPanel extends JPanel {
 
         add(formPanel, BorderLayout.NORTH);
 
-        // === Orta Panel ===
+        // === Center Panel: Car Table ===
         String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Color", "Rent", "Status"};
         tableModel = new DefaultTableModel(columns, 0);
         carTable = new JTable(tableModel);
         carTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         add(new JScrollPane(carTable), BorderLayout.CENTER);
 
-        // === Alt Panel ===
+        // === Bottom Panel: Buttons ===
         JPanel buttonPanel = new JPanel();
-        addButton = new JButton("Ekle");
-        deleteButton = new JButton("Sil");
-        updateButton = new JButton("Güncelle");
+        addButton = new JButton("Add");
+        deleteButton = new JButton("Delete");
+        updateButton = new JButton("Update");
 
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(updateButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // === Eventler ===
+        // === Events ===
         addButton.addActionListener(e -> onAddCar());
         deleteButton.addActionListener(e -> onDeleteCar());
         updateButton.addActionListener(e -> onUpdateCar());
@@ -104,6 +102,16 @@ public class AdminPanel extends JPanel {
         rentField.setText(tableModel.getValueAt(row, 6).toString());
     }
 
+    private void clearForm() {
+        modelField.setText("");
+        rentField.setText("");
+        seatField.setText("");
+        fuelBox.setSelectedIndex(0);
+        transBox.setSelectedIndex(0);
+        colorBox.setSelectedIndex(0);
+        carTable.clearSelection();
+    }
+
     private void onAddCar() {
         try {
             String model = modelField.getText().trim();
@@ -115,7 +123,7 @@ public class AdminPanel extends JPanel {
 
             boolean specAdded = VehicleSpecificationController.addSpecification(color, fuel, trans, seats);
             if (!specAdded) {
-                JOptionPane.showMessageDialog(this, "Teknik özellik eklenemedi.");
+                JOptionPane.showMessageDialog(this, "Failed to add vehicle specifications.");
                 return;
             }
 
@@ -123,35 +131,37 @@ public class AdminPanel extends JPanel {
             boolean added = CarController.addCar(model, rent, 0.0, 0, "available", lastSpecId);
 
             if (added) {
-                JOptionPane.showMessageDialog(this, "Araç başarıyla eklendi.");
+                JOptionPane.showMessageDialog(this, "Car successfully added.");
                 loadCars();
+                clearForm();
             } else {
-                JOptionPane.showMessageDialog(this, "Araç eklenemedi.");
+                JOptionPane.showMessageDialog(this, "Failed to add car.");
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Kira ücreti ve koltuk sayısı sayısal olmalıdır.");
+            JOptionPane.showMessageDialog(this, "Rent and seat count must be numeric.");
         }
     }
 
     private void onDeleteCar() {
         int row = carTable.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Silmek için bir araç seçin.");
+            JOptionPane.showMessageDialog(this, "Please select a car to delete.");
             return;
         }
         int carId = (int) tableModel.getValueAt(row, 0);
         if (CarController.deleteCar(carId)) {
-            JOptionPane.showMessageDialog(this, "Araç silindi.");
+            JOptionPane.showMessageDialog(this, "Car successfully deleted.");
             loadCars();
+            clearForm();
         } else {
-            JOptionPane.showMessageDialog(this, "Silme işlemi başarısız oldu.");
+            JOptionPane.showMessageDialog(this, "Failed to delete car.");
         }
     }
 
     private void onUpdateCar() {
         int row = carTable.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Güncellemek için bir araç seçin.");
+            JOptionPane.showMessageDialog(this, "Please select a car to update.");
             return;
         }
         try {
@@ -172,14 +182,15 @@ public class AdminPanel extends JPanel {
             }
 
             if (carOk && specOk) {
-                JOptionPane.showMessageDialog(this, "Araç başarıyla güncellendi.");
+                JOptionPane.showMessageDialog(this, "Car successfully updated.");
                 loadCars();
+                clearForm();
             } else {
-                JOptionPane.showMessageDialog(this, "Güncelleme başarısız oldu.");
+                JOptionPane.showMessageDialog(this, "Failed to update car.");
             }
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Geçerli sayısal değerler giriniz.");
+            JOptionPane.showMessageDialog(this, "Please enter valid numeric values.");
         }
     }
 }

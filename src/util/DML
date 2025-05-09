@@ -76,6 +76,7 @@ VALUES
   ('Renault Talisman 1.6',         60.00, 600.00, 43100, 'available'),
   ('Honda CR-V 2.0 Hybrid',       110.00, 950.00, 29700, 'rented'),
   ('Citroën C3 1.2',               37.00, 350.00, 62200, 'available'),
+  ('volkswagen t-roc',             50.00, 370.00, 92900, 'available'),  
   ('Lexus NX 300h',               130.00, 1100.00, 22500, 'available');
   
   

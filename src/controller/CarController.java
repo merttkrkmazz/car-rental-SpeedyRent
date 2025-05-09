@@ -237,29 +237,31 @@ public class CarController {
         }
         return cars;
     }
+
     public static List<Car> getAllCarsAsObjects() {
         List<Car> cars = new ArrayList<>();
         String sql =
                 "SELECT c.car_id, c.model, c.daily_rent, c.vehicle_status, " +
-                        "       vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
+                        "       vs.color, vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
                         "  FROM Car c " +
                         "  JOIN has h ON c.car_id = h.car_id " +
                         "  JOIN VehicleSpecification vs ON h.specification_id = vs.specification_id";
+
         try (Connection conn = Srent_DB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 cars.add(new Car(
-                    rs.getInt("car_id"),
-                    "Unknown",                                // placeholder brand
-                    rs.getString("model"),
-                    rs.getString("color"),                    // artık ok
-                    rs.getString("fuel_type"),
-                    rs.getString("transmission_type"),
-                    rs.getInt("seating_capacity"),
-                    rs.getDouble("daily_rent"),
-                    "available".equalsIgnoreCase(rs.getString("vehicle_status"))  // boolean param
+                        rs.getInt("car_id"),
+                        "Unknown", // brand
+                        rs.getString("model"),
+                        rs.getString("color"),
+                        rs.getString("fuel_type"),
+                        rs.getString("transmission_type"),
+                        rs.getInt("seating_capacity"),
+                        rs.getDouble("daily_rent"),
+                        "available".equalsIgnoreCase(rs.getString("vehicle_status"))
                 ));
             }
         } catch (SQLException e) {
@@ -292,26 +294,27 @@ public class CarController {
         List<Car> cars = new ArrayList<>();
         String sql =
                 "SELECT c.car_id, c.model, c.daily_rent, c.vehicle_status, " +
-                        "       vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
+                        "       vs.color, vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
                         "  FROM Car c " +
                         "  JOIN has h ON c.car_id = h.car_id " +
                         "  JOIN VehicleSpecification vs ON h.specification_id = vs.specification_id " +
                         " WHERE c.vehicle_status = 'available'";
+
         try (Connection conn = Srent_DB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 cars.add(new Car(
-                    rs.getInt("car_id"),
-                    "Unknown",
-                    rs.getString("model"),
-                    rs.getString("color"),
-                    rs.getString("fuel_type"),
-                    rs.getString("transmission_type"),
-                    rs.getInt("seating_capacity"),
-                    rs.getDouble("daily_rent"),
-                    true  // zaten yalnızca available seçiliyor
+                        rs.getInt("car_id"),
+                        "Unknown",
+                        rs.getString("model"),
+                        rs.getString("color"),
+                        rs.getString("fuel_type"),
+                        rs.getString("transmission_type"),
+                        rs.getInt("seating_capacity"),
+                        rs.getDouble("daily_rent"),
+                        true
                 ));
             }
         } catch (SQLException e) {
@@ -319,7 +322,6 @@ public class CarController {
         }
         return cars;
     }
-
 
     public static List<String> getCarsByStatus(String status) {
         List<String> cars = new ArrayList<>();

@@ -9,6 +9,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+// === imports aynı ===
+
 public class AdminPanel extends JPanel {
     private final CardLayout cardLayout;
     private final JPanel container;
@@ -16,7 +18,7 @@ public class AdminPanel extends JPanel {
     private DefaultTableModel tableModel;
 
     private JTextField modelField, rentField, seatField;
-    private JComboBox<String> fuelBox, transBox;
+    private JComboBox<String> fuelBox, transBox, colorBox;
     private JButton addButton, deleteButton, updateButton;
 
     public AdminPanel(CardLayout cardLayout, JPanel container) {
@@ -26,13 +28,14 @@ public class AdminPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // === ÜST Panel: Form alanları ===
-        JPanel formPanel = new JPanel(new GridLayout(2, 6, 5, 5));
+        JPanel formPanel = new JPanel(new GridLayout(2, 7, 5, 5));
 
         modelField = new JTextField();
         rentField = new JTextField();
         seatField = new JTextField();
-        fuelBox = new JComboBox<>(new String[]{"Gasoline", "Diesel", "Electric", "Hybrid"});
+        fuelBox  = new JComboBox<>(new String[]{"Gasoline", "Diesel", "Electric", "Hybrid"});
         transBox = new JComboBox<>(new String[]{"Automatic", "Manual"});
+        colorBox = new JComboBox<>(new String[]{"Black", "White", "Red", "Blue", "Silver"});
 
         formPanel.add(new JLabel("Model:"));
         formPanel.add(modelField);
@@ -44,19 +47,20 @@ public class AdminPanel extends JPanel {
         formPanel.add(fuelBox);
         formPanel.add(new JLabel("Transmission:"));
         formPanel.add(transBox);
+        formPanel.add(new JLabel("Color:"));
+        formPanel.add(colorBox);
 
         add(formPanel, BorderLayout.NORTH);
 
-        // === ORTA Panel: Araç tablosu ===
-        String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Rent", "Status"};
+        // === Orta Panel ===
+        String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Color", "Rent", "Status"};
         tableModel = new DefaultTableModel(columns, 0);
         carTable = new JTable(tableModel);
         carTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         add(new JScrollPane(carTable), BorderLayout.CENTER);
 
-        // === ALT Panel: Butonlar ===
+        // === Alt Panel ===
         JPanel buttonPanel = new JPanel();
-
         addButton = new JButton("Ekle");
         deleteButton = new JButton("Sil");
         updateButton = new JButton("Güncelle");
@@ -64,7 +68,6 @@ public class AdminPanel extends JPanel {
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(updateButton);
-
         add(buttonPanel, BorderLayout.SOUTH);
 
         // === Eventler ===
@@ -78,17 +81,13 @@ public class AdminPanel extends JPanel {
 
     private void loadCars() {
         tableModel.setRowCount(0);
-        // now shows ALL cars, not just available
         List<Car> cars = CarController.getAllCarsAsObjects();
         for (Car car : cars) {
             tableModel.addRow(new Object[]{
-                    car.getId(),
-                    car.getModel(),
-                    car.getFuelType(),
-                    car.getTransmission(),
-                    car.getSeatingCapacity(),
-                    car.getRentalPrice(),
-                    car.isAvailable()
+                    car.getId(), car.getModel(),
+                    car.getFuelType(), car.getTransmission(),
+                    car.getSeatingCapacity(), car.getColor(),
+                    car.getRentalPrice(), car.isAvailable()
             });
         }
     }
@@ -101,7 +100,8 @@ public class AdminPanel extends JPanel {
         fuelBox.setSelectedItem(tableModel.getValueAt(row, 2).toString());
         transBox.setSelectedItem(tableModel.getValueAt(row, 3).toString());
         seatField.setText(tableModel.getValueAt(row, 4).toString());
-        rentField.setText(tableModel.getValueAt(row, 5).toString());
+        colorBox.setSelectedItem(tableModel.getValueAt(row, 5).toString());
+        rentField.setText(tableModel.getValueAt(row, 6).toString());
     }
 
     private void onAddCar() {
@@ -111,20 +111,17 @@ public class AdminPanel extends JPanel {
             int seats = Integer.parseInt(seatField.getText().trim());
             String fuel = (String) fuelBox.getSelectedItem();
             String trans = (String) transBox.getSelectedItem();
+            String color = (String) colorBox.getSelectedItem();
 
-            // 1. Spec'i veritabanına ekle
-            boolean specAdded = VehicleSpecificationController.addSpecification("black", fuel, trans, seats); // renk geçici
+            boolean specAdded = VehicleSpecificationController.addSpecification(color, fuel, trans, seats);
             if (!specAdded) {
                 JOptionPane.showMessageDialog(this, "Teknik özellik eklenemedi.");
                 return;
             }
 
-            // 2. Son eklenen spec_id'yi bul (en yüksek ID varsayımı)
-            List<String> allSpecs = VehicleSpecificationController.getAllSpecifications();
-            int lastSpecId = allSpecs.size(); // En son eklenenin ID'si olduğunu varsayarsak
-
-            // 3. Aracı ekle
+            int lastSpecId = VehicleSpecificationController.getAllSpecifications().size();
             boolean added = CarController.addCar(model, rent, 0.0, 0, "available", lastSpecId);
+
             if (added) {
                 JOptionPane.showMessageDialog(this, "Araç başarıyla eklendi.");
                 loadCars();
@@ -136,7 +133,6 @@ public class AdminPanel extends JPanel {
         }
     }
 
-
     private void onDeleteCar() {
         int row = carTable.getSelectedRow();
         if (row == -1) {
@@ -144,8 +140,7 @@ public class AdminPanel extends JPanel {
             return;
         }
         int carId = (int) tableModel.getValueAt(row, 0);
-        boolean success = CarController.deleteCar(carId);
-        if (success) {
+        if (CarController.deleteCar(carId)) {
             JOptionPane.showMessageDialog(this, "Araç silindi.");
             loadCars();
         } else {
@@ -166,21 +161,14 @@ public class AdminPanel extends JPanel {
             int seats = Integer.parseInt(seatField.getText().trim());
             String fuel = (String) fuelBox.getSelectedItem();
             String trans = (String) transBox.getSelectedItem();
+            String color = (String) colorBox.getSelectedItem();
 
-            // 1) update Car table
             boolean carOk = CarController.updateCar(carId, model, rent, "available");
-
-            // 2) update its VehicleSpecification row
             int specId = CarController.getSpecificationIdForCar(carId);
             boolean specOk = false;
+
             if (specId > 0) {
-                specOk = VehicleSpecificationController.updateSpecification(
-                        specId,
-                        "black",   // or add a color field later
-                        fuel,
-                        trans,
-                        seats
-                );
+                specOk = VehicleSpecificationController.updateSpecification(specId, color, fuel, trans, seats);
             }
 
             if (carOk && specOk) {
@@ -194,5 +182,4 @@ public class AdminPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Geçerli sayısal değerler giriniz.");
         }
     }
-
 }

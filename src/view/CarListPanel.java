@@ -27,7 +27,7 @@ public class CarListPanel extends JPanel {
 
         setLayout(new BorderLayout());
 
-        // === ÜST Panel: Filtre/Sıralama ===
+        // === Top Panel: Filter / Sort ===
         JPanel topPanel = new JPanel(new FlowLayout());
 
         fuelFilterBox = new JComboBox<>(new String[]{"All", "Gasoline", "Diesel", "Electric", "Hybrid"});
@@ -42,26 +42,26 @@ public class CarListPanel extends JPanel {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // === ORTA Panel: Tablo ===
+        // === Center Panel: Car Table ===
         String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Color", "Price", "Status"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
         carTable = new JTable(tableModel);
         carTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         add(new JScrollPane(carTable), BorderLayout.CENTER);
 
-        // === ALT Panel: Kirala butonu ===
-        rentButton = new JButton("Kirala");
+        // === Bottom Panel: Rent Button ===
+        rentButton = new JButton("Rent");
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(rentButton);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // === Eventler ===
+        // === Events ===
         fuelFilterBox.addActionListener(e -> applyFilters());
         transmissionFilterBox.addActionListener(e -> applyFilters());
         sortBox.addActionListener(e -> applyFilters());
         rentButton.addActionListener(e -> onRentButton());
 
-        // === Verileri Yükle ===
+        // === Load Initial Data ===
         loadCars();
     }
 
@@ -76,20 +76,20 @@ public class CarListPanel extends JPanel {
         String sortOption    = (String) sortBox.getSelectedItem();
 
         List<Car> filtered = allCars.stream()
-            .filter(c -> selectedFuel.equals("All") || c.getFuelType().equalsIgnoreCase(selectedFuel))
-            .filter(c -> selectedTrans.equals("All") || c.getTransmission().equalsIgnoreCase(selectedTrans))
-            .collect(Collectors.toList());
+                .filter(c -> selectedFuel.equals("All") || c.getFuelType().equalsIgnoreCase(selectedFuel))
+                .filter(c -> selectedTrans.equals("All") || c.getTransmission().equalsIgnoreCase(selectedTrans))
+                .collect(Collectors.toList());
 
         if (sortOption.equals("Sort by Price ↑")) {
-            filtered.sort((a,b) -> Double.compare(a.getRentalPrice(), b.getRentalPrice()));
+            filtered.sort((a, b) -> Double.compare(a.getRentalPrice(), b.getRentalPrice()));
         } else {
-            filtered.sort((a,b) -> Double.compare(b.getRentalPrice(), a.getRentalPrice()));
+            filtered.sort((a, b) -> Double.compare(b.getRentalPrice(), a.getRentalPrice()));
         }
 
-        DefaultTableModel m = (DefaultTableModel)carTable.getModel();
-        m.setRowCount(0);
+        DefaultTableModel model = (DefaultTableModel) carTable.getModel();
+        model.setRowCount(0);
         for (Car c : filtered) {
-            m.addRow(new Object[]{
+            model.addRow(new Object[]{
                     c.getId(), c.getModel(),
                     c.getFuelType(), c.getTransmission(),
                     c.getSeatingCapacity(), c.getColor(),
@@ -101,17 +101,19 @@ public class CarListPanel extends JPanel {
     private void onRentButton() {
         int row = carTable.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Lütfen bir araç seçin.");
+            JOptionPane.showMessageDialog(this, "Please select a car to rent.");
             return;
         }
 
-        int   carId = (int)carTable.getValueAt(row, 0);
-        Car   sel   = allCars.stream().filter(c -> c.getId()==carId).findFirst().orElse(null);
+        int carId = (int) carTable.getValueAt(row, 0);
+        Car selected = allCars.stream()
+                .filter(c -> c.getId() == carId)
+                .findFirst()
+                .orElse(null);
 
-        if (sel != null) {
-            // now matches your constructor (Car + dummy userId = 0)
-            BookingPanel bp = new BookingPanel(cardLayout, container, sel, 0);
-            container.add(bp, "booking");
+        if (selected != null) {
+            BookingPanel bookingPanel = new BookingPanel(cardLayout, container, selected, 0);
+            container.add(bookingPanel, "booking");
             cardLayout.show(container, "booking");
         }
     }

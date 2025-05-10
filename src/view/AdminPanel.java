@@ -2,11 +2,12 @@ package view;
 
 import controller.CarController;
 import controller.VehicleSpecificationController;
-import java.awt.*;
-import java.util.List;
+import model.Car;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import model.Car;
+import java.awt.*;
+import java.util.List;
 
 public class AdminPanel extends JPanel {
     private final CardLayout cardLayout;
@@ -18,6 +19,7 @@ public class AdminPanel extends JPanel {
     private JTextField modelField, rentField, seatField;
     private JComboBox<String> fuelBox, transBox, colorBox, statusBox;
     private JButton addButton, deleteButton, updateButton;
+    private JButton manageBookingsButton;
 
     public AdminPanel(CardLayout cardLayout, JPanel container) {
         this.cardLayout = cardLayout;
@@ -37,13 +39,8 @@ public class AdminPanel extends JPanel {
 
         fuelBox = new JComboBox<>(new String[]{"Gasoline", "Diesel", "Electric", "Hybrid"});
         transBox = new JComboBox<>(new String[]{"Automatic", "Manual"});
-        colorBox = new JComboBox<>(new String[]{
-            "White", "Black", "Gray", "Silver", "Blue", "Red", "Brown",
-            "Green", "Beige", "Yellow", "Orange", "Gold", "Purple",
-            "Navy", "Maroon", "Bronze", "Turquoise", "Teal"
-        });
-        
-        statusBox = new JComboBox<>(new String[]{"available", "rented","service", "retired" });
+        colorBox = new JComboBox<>(new String[]{"Black", "White", "Red", "Blue", "Silver"});
+        statusBox = new JComboBox<>(new String[]{"available", "reserved"});
 
         // Row 0
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(new JLabel("Model:"), gbc);
@@ -81,18 +78,36 @@ public class AdminPanel extends JPanel {
         addButton = new JButton("Add");
         deleteButton = new JButton("Delete");
         updateButton = new JButton("Update");
+        manageBookingsButton = new JButton("Manage Bookings");
+
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(updateButton);
+        buttonPanel.add(manageBookingsButton);
+
         add(buttonPanel, BorderLayout.SOUTH);
 
         // === Events ===
         addButton.addActionListener(e -> onAddCar());
         deleteButton.addActionListener(e -> onDeleteCar());
         updateButton.addActionListener(e -> onUpdateCar());
+        manageBookingsButton.addActionListener(e -> {
+            ReservationManagementPanel rmp = new ReservationManagementPanel(cardLayout, container, true);
+            container.add(rmp, "manage_reservations");
+            cardLayout.show(container, "manage_reservations");
+        });
+
         carTable.getSelectionModel().addListSelectionListener(e -> fillFormFromTable());
 
         loadCars();
+
+        // En sona ekle:
+        this.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                loadCars();
+            }
+        });
     }
 
     private void loadCars() {

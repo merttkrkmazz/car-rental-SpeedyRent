@@ -1,50 +1,45 @@
-// src/view/BookingPanel.java
 package view;
 
 import controller.BookingController;
 import controller.CarController;
+import model.Car;
+
+import javax.swing.*;
 import java.awt.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
-import javax.swing.*;
-import model.Car;
+import java.util.Locale;
 
-/**
- * BookingPanel provides a user interface for confirming a car booking.
- * It displays selected car details, allows date selection, additional services,
- * calculates the total cost, and invokes booking logic.
- */
 public class BookingPanel extends JPanel {
     private final CardLayout cardLayout;
-    private final JPanel     container;
-    private final Car        selectedCar;
-    private final int        currentUserId;
+    private final JPanel container;
+    private final Car selectedCar;
+    private final int currentUserId;
 
-    private JSpinner  spinnerStartDate;
-    private JSpinner  spinnerEndDate;
+    private JSpinner spinnerStartDate;
+    private JSpinner spinnerEndDate;
     private JCheckBox chkGPS;
     private JCheckBox chkChildSeat;
     private JCheckBox chkInsurance;
-    private JLabel    lblTotalCost;
-    private JButton   btnConfirm;
-    private JButton   btnCancel;
+    private JLabel lblTotalCost;
+    private JButton btnConfirm;
+    private JButton btnCancel;
 
-    // Service rates per day
-    private static final double GPS_RATE       = 10.0;
-    private static final double CHILD_SEAT_RATE= 5.0;
+    private static final double GPS_RATE = 10.0;
+    private static final double CHILD_SEAT_RATE = 5.0;
     private static final double INSURANCE_RATE = 20.0;
 
-    public BookingPanel(CardLayout cardLayout,
-                        JPanel container,
-                        Car selectedCar,
-                        int currentUserId) {
-        this.cardLayout    = cardLayout;
-        this.container     = container;
-        this.selectedCar   = selectedCar;
+    public BookingPanel(CardLayout cardLayout, JPanel container, Car selectedCar, int currentUserId) {
+        this.cardLayout = cardLayout;
+        this.container = container;
+        this.selectedCar = selectedCar;
         this.currentUserId = currentUserId;
+
         setLayout(new BorderLayout(10, 10));
         initComponents();
         registerListeners();
@@ -52,12 +47,10 @@ public class BookingPanel extends JPanel {
     }
 
     private void initComponents() {
-        // Title
         JLabel title = new JLabel("Booking: " + selectedCar.getModel(), SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 18));
         add(title, BorderLayout.NORTH);
 
-        // Center panel with form
         JPanel formPanel = new JPanel(new GridLayout(6, 2, 10, 10));
 
         formPanel.add(new JLabel("Start Date:"));
@@ -72,7 +65,7 @@ public class BookingPanel extends JPanel {
 
         formPanel.add(new JLabel("Additional Services:"));
         JPanel servicesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        chkGPS       = new JCheckBox("GPS");
+        chkGPS = new JCheckBox("GPS");
         chkChildSeat = new JCheckBox("Child Seat");
         chkInsurance = new JCheckBox("Insurance");
         servicesPanel.add(chkGPS);
@@ -87,10 +80,9 @@ public class BookingPanel extends JPanel {
 
         add(formPanel, BorderLayout.CENTER);
 
-        // Buttons
         JPanel btnPanel = new JPanel();
         btnConfirm = new JButton("Confirm Booking");
-        btnCancel  = new JButton("Cancel");
+        btnCancel = new JButton("Cancel");
         btnPanel.add(btnConfirm);
         btnPanel.add(btnCancel);
         add(btnPanel, BorderLayout.SOUTH);
@@ -115,22 +107,21 @@ public class BookingPanel extends JPanel {
         long days = ChronoUnit.DAYS.between(start, end) + 1;
         if (days < 1) days = 1;
 
-        double base     = selectedCar.getRentalPrice() * days;
+        double base = selectedCar.getRentalPrice() * days;
         double services = 0;
-        if (chkGPS.isSelected())       services += GPS_RATE * days;
+        if (chkGPS.isSelected()) services += GPS_RATE * days;
         if (chkChildSeat.isSelected()) services += CHILD_SEAT_RATE * days;
         if (chkInsurance.isSelected()) services += INSURANCE_RATE * days;
 
         double total = base + services;
-        lblTotalCost.setText(String.format("$%.2f", total));
+        lblTotalCost.setText(String.format("%.2f", total));
     }
 
     private void doConfirmBooking() {
-        // Check availability
         if (!CarController.isCarAvailable(selectedCar.getId())) {
             JOptionPane.showMessageDialog(this,
-                "Sorry, this car is no longer available.",
-                "Unavailable", JOptionPane.WARNING_MESSAGE);
+                    "Sorry, this car is no longer available.",
+                    "Unavailable", JOptionPane.WARNING_MESSAGE);
             cardLayout.show(container, "carlist");
             return;
         }
@@ -140,32 +131,43 @@ public class BookingPanel extends JPanel {
         LocalDate end = ((Date) spinnerEndDate.getValue()).toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDate();
         String startStr = start.toString();
-        String endStr   = end.toString();
-        double totalCost= Double.parseDouble(lblTotalCost.getText().replace("$", "").replace(",", "."));
+        String endStr = end.toString();
+
+        double totalCost;
+        try {
+            String costStr = lblTotalCost.getText().replace("$", "").trim();
+            NumberFormat format = NumberFormat.getInstance(Locale.getDefault());
+            Number number = format.parse(costStr);
+            totalCost = number.doubleValue();
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Invalid total cost format.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         boolean success = BookingController.createBooking(
                 currentUserId,
                 selectedCar.getId(),
                 startStr,
                 endStr,
-                0.0,          // deposit
+                0.0,
                 totalCost,
-                "self",       // drive option
-                0,            // initial odometer
-                startStr      // date out
+                "self",
+                0,
+                startStr
         );
-        if (success) {
-            // Car status become "reserved"
-            CarController.updateCar(selectedCar.getId(), selectedCar.getModel(), selectedCar.getRentalPrice(), "reserved");
 
+        if (success) {
+            CarController.updateCar(selectedCar.getId(), selectedCar.getModel(), selectedCar.getRentalPrice(), "reserved");
             JOptionPane.showMessageDialog(this,
-                "Booking confirmed!\nTotal: " + lblTotalCost.getText(),
-                "Success", JOptionPane.INFORMATION_MESSAGE);
+                    "Booking confirmed!\nTotal: $" + totalCost,
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
             cardLayout.show(container, "carlist");
         } else {
             JOptionPane.showMessageDialog(this,
-                "Booking failed. Please try again.",
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Booking failed. Please try again.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

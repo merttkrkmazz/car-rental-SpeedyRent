@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
+import util.Session;
 import java.util.Locale;
 
 public class BookingPanel extends JPanel {
@@ -34,11 +35,11 @@ public class BookingPanel extends JPanel {
     private static final double CHILD_SEAT_RATE = 5.0;
     private static final double INSURANCE_RATE = 20.0;
 
-    public BookingPanel(CardLayout cardLayout, JPanel container, Car selectedCar, int currentUserId) {
+    public BookingPanel(CardLayout cardLayout, JPanel container, Car selectedCar) {
         this.cardLayout = cardLayout;
         this.container = container;
         this.selectedCar = selectedCar;
-        this.currentUserId = currentUserId;
+        this.currentUserId = Session.getCurrentUserId();
 
         setLayout(new BorderLayout(10, 10));
         initComponents();

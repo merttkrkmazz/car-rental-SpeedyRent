@@ -1,13 +1,12 @@
 package view;
 
 import controller.CarController;
-import model.Car;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import model.Car;
 
 public class CarListPanel extends JPanel {
     private final CardLayout cardLayout;
@@ -63,6 +62,11 @@ public class CarListPanel extends JPanel {
 
         // === Load Initial Data ===
         loadCars();
+
+        // === ID sütununu gizle ===
+        carTable.getColumnModel().getColumn(0).setMinWidth(0);
+        carTable.getColumnModel().getColumn(0).setMaxWidth(0);
+        carTable.getColumnModel().getColumn(0).setWidth(0);
     }
 
     private void loadCars() {
@@ -73,7 +77,7 @@ public class CarListPanel extends JPanel {
     private void applyFilters() {
         String selectedFuel = (String) fuelFilterBox.getSelectedItem();
         String selectedTrans = (String) transmissionFilterBox.getSelectedItem();
-        String sortOption    = (String) sortBox.getSelectedItem();
+        String sortOption = (String) sortBox.getSelectedItem();
 
         List<Car> filtered = allCars.stream()
                 .filter(c -> selectedFuel.equals("All") || c.getFuelType().equalsIgnoreCase(selectedFuel))

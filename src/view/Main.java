@@ -1,4 +1,3 @@
-// src/view/Main.java
 package view;
 
 import javax.swing.*;
@@ -8,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(
-              UIManager.getSystemLookAndFeelClassName()
+                    UIManager.getSystemLookAndFeelClassName()
             );
         } catch (Exception ignored) {}
 
@@ -22,13 +21,11 @@ public class Main {
             JPanel container  = new JPanel(cardLayout);
 
             // === Panellerin oluşturulması ===
-            LoginPanel    loginPanel   = new LoginPanel(cardLayout, container);
-            CarListPanel  carListPanel = new CarListPanel(cardLayout, container);
-            AdminPanel    adminPanel   = new AdminPanel(cardLayout, container);
+            LoginPanel loginPanel = new LoginPanel(cardLayout, container);
+            AdminPanel adminPanel = new AdminPanel(cardLayout, container);
 
             // === Panelleri karta ekle ===
-            container.add(loginPanel,   "login");
-            container.add(carListPanel, "carlist");
+            container.add(loginPanel, "login");
             container.add(adminPanel,   "admin");
 
             frame.setContentPane(container);

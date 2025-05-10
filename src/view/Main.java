@@ -25,8 +25,8 @@ public class Main {
             AdminPanel adminPanel = new AdminPanel(cardLayout, container);
 
             // === Panelleri karta ekle ===
-            container.add(loginPanel, "login");
-            container.add(adminPanel,   "admin");
+            container.add(loginPanel,"login");
+            container.add(adminPanel,"admin");
 
             frame.setContentPane(container);
             frame.setVisible(true);

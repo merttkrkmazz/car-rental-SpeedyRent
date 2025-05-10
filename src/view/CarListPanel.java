@@ -147,7 +147,7 @@ public class CarListPanel extends JPanel {
                     c.getSeatingCapacity(),
                     c.getColor(),
                     c.getRentalPrice(),
-                    c.isAvailable()
+                    c.getStatus()
             });
         }
     }

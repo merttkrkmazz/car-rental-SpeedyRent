@@ -254,14 +254,14 @@ public class CarController {
             while (rs.next()) {
                 cars.add(new Car(
                         rs.getInt("car_id"),
-                        "Unknown", // brand
+                        "Unknown",
                         rs.getString("model"),
                         rs.getString("color"),
                         rs.getString("fuel_type"),
                         rs.getString("transmission_type"),
                         rs.getInt("seating_capacity"),
                         rs.getDouble("daily_rent"),
-                        "available".equalsIgnoreCase(rs.getString("vehicle_status"))
+                        rs.getString("vehicle_status")
                 ));
             }
         } catch (SQLException e) {
@@ -314,7 +314,7 @@ public class CarController {
                         rs.getString("transmission_type"),
                         rs.getInt("seating_capacity"),
                         rs.getDouble("daily_rent"),
-                        true
+                        rs.getString("vehicle_status")
                 ));
             }
         } catch (SQLException e) {

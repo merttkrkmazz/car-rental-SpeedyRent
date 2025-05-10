@@ -10,8 +10,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CarListPanel extends JPanel {
+    private final int currentUserId;
+
     private final CardLayout cardLayout;
     private final JPanel container;
+
 
     private JTable carTable;
     private JTextField minPriceField, maxPriceField;
@@ -21,9 +24,10 @@ public class CarListPanel extends JPanel {
 
     private List<Car> allCars;
 
-    public CarListPanel(CardLayout cardLayout, JPanel container) {
+    public CarListPanel(CardLayout cardLayout, JPanel container, int currentUserId) {
         this.cardLayout = cardLayout;
         this.container = container;
+        this.currentUserId  = currentUserId;
         setLayout(new BorderLayout());
 
         // === Top Filter Panel ===
@@ -104,6 +108,14 @@ public class CarListPanel extends JPanel {
         rentButton.addActionListener(e -> onRent());
 
         loadCars();
+
+        // **BURAYA EKLE**
+        this.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                loadCars();
+            }
+        });
     }
 
     private void loadCars() {
@@ -179,7 +191,7 @@ public class CarListPanel extends JPanel {
         Car selected = allCars.stream().filter(c -> c.getId() == carId).findFirst().orElse(null);
 
         if (selected != null) {
-            BookingPanel bookingPanel = new BookingPanel(cardLayout, container, selected, 0);
+            BookingPanel bookingPanel = new BookingPanel(cardLayout, container, selected, currentUserId);
             container.add(bookingPanel, "booking");
             cardLayout.show(container, "booking");
         }

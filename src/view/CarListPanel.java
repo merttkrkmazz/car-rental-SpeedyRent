@@ -2,12 +2,12 @@ package view;
 
 import controller.CarController;
 import model.Car;
+import util.Session;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import util.Session;
 import java.util.stream.Collectors;
 
 public class CarListPanel extends JPanel {
@@ -16,12 +16,11 @@ public class CarListPanel extends JPanel {
     private final CardLayout cardLayout;
     private final JPanel container;
 
-
     private JTable carTable;
     private JTextField minPriceField, maxPriceField;
     private JTextField minSeatField, maxSeatField;
     private JComboBox<String> fuelBox, transBox, colorBox, sortBox;
-    private JButton applyButton, resetButton, rentButton;
+    private JButton applyButton, resetButton, rentButton, myReservationsButton;
 
     private List<Car> allCars;
 
@@ -90,7 +89,10 @@ public class CarListPanel extends JPanel {
         // === Bottom Panel ===
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         rentButton = new JButton("Rent");
+        myReservationsButton = new JButton("My Reservations");
+
         bottomPanel.add(rentButton);
+        bottomPanel.add(myReservationsButton);
         add(bottomPanel, BorderLayout.SOUTH);
 
         // === Events ===
@@ -106,17 +108,24 @@ public class CarListPanel extends JPanel {
             maxSeatField.setText("");
             applyFilters();
         });
+
         rentButton.addActionListener(e -> onRent());
 
-        loadCars();
+        myReservationsButton.addActionListener(e -> {
+            ReservationManagementPanel rmp = new ReservationManagementPanel(cardLayout, container, false);
+            container.add(rmp, "manage_reservations");
+            cardLayout.show(container, "manage_reservations");
+        });
 
-        // **BURAYA EKLE**
+        // Refresh cars when this panel is shown
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentShown(java.awt.event.ComponentEvent e) {
                 loadCars();
             }
         });
+
+        loadCars();
     }
 
     private void loadCars() {

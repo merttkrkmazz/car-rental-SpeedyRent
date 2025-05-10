@@ -23,19 +23,19 @@ public class AuthenticationController {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-    
+
         try {
             conn = Srent_DB.getConnection();
             if (conn == null) {
                 System.err.println("Database connection is null.");
                 return UserRole.UNKNOWN;
             }
-    
+
             ps = conn.prepareStatement(sql);
             ps.setInt(1, userId);
             ps.setString(2, username);
             rs = ps.executeQuery();
-    
+
             if (rs.next()) {
                 try {
                     if (isAdmin(userId, conn)) {
@@ -57,24 +57,24 @@ public class AuthenticationController {
                 System.out.println("Login failed: invalid user ID or username.");
                 return UserRole.UNKNOWN;
             }
-    
+
         } catch (SQLException e) {
             System.err.println("SQL error during login: " + e.getMessage());
             e.printStackTrace();
             return UserRole.UNKNOWN;
-    
+
         } catch (Exception e) {
             System.err.println("Unexpected error during login: " + e.getMessage());
             e.printStackTrace();
             return UserRole.UNKNOWN;
-    
+
         } finally {
             try { if (rs != null) rs.close(); } catch (Exception e) { }
             try { if (ps != null) ps.close(); } catch (Exception e) { }
             try { if (conn != null) conn.close(); } catch (Exception e) { }
         }
     }
-    
+
 
     /**
      * Kullanıcı admin mi kontrolü
@@ -143,25 +143,25 @@ public class AuthenticationController {
         PreparedStatement getIdStmt = null;
         PreparedStatement insertCustomerStmt = null;
         ResultSet rs = null;
-    
+
         try {
             conn = Srent_DB.getConnection();
             if (conn == null) {
                 System.err.println("Database connection is null.");
                 return false;
             }
-    
+
             String checkEmailSql = "SELECT * FROM User WHERE email = ?";
             checkEmailStmt = conn.prepareStatement(checkEmailSql);
             checkEmailStmt.setString(1, email);
             rs = checkEmailStmt.executeQuery();
-    
+
             if (rs.next()) {
                 System.out.println("This email is already registered.");
                 return false;
             }
             rs.close();
-    
+
             String insertUserSql = "INSERT INTO User (first_name, last_name, username, email, gender, address) VALUES (?, ?, ?, ?, ?, ?)";
             insertUserStmt = conn.prepareStatement(insertUserSql);
             insertUserStmt.setString(1, firstName);
@@ -171,11 +171,11 @@ public class AuthenticationController {
             insertUserStmt.setString(5, gender);
             insertUserStmt.setString(6, address);
             insertUserStmt.executeUpdate();
-    
+
             String getIdSql = "SELECT LAST_INSERT_ID() AS last_id";
             getIdStmt = conn.prepareStatement(getIdSql);
             rs = getIdStmt.executeQuery();
-    
+
             int userId;
             if (rs.next()) {
                 userId = rs.getInt("last_id");
@@ -184,26 +184,26 @@ public class AuthenticationController {
                 return false;
             }
             rs.close();
-    
+
             String insertCustomerSql = "INSERT INTO Customer (user_id, occupation) VALUES (?, ?)";
             insertCustomerStmt = conn.prepareStatement(insertCustomerSql);
             insertCustomerStmt.setInt(1, userId);
             insertCustomerStmt.setString(2, occupation);
             insertCustomerStmt.executeUpdate();
-    
+
             System.out.println("Customer registered successfully.");
             return true;
-    
+
         } catch (SQLException e) {
             System.err.println("SQL error during registration: " + e.getMessage());
             e.printStackTrace();
             return false;
-    
+
         } catch (Exception e) {
             System.err.println("Unexpected error during registration: " + e.getMessage());
             e.printStackTrace();
             return false;
-    
+
         } finally {
             try { if (rs != null) rs.close(); } catch (Exception e) { }
             try { if (checkEmailStmt != null) checkEmailStmt.close(); } catch (Exception e) { }
@@ -213,7 +213,7 @@ public class AuthenticationController {
             try { if (conn != null) conn.close(); } catch (Exception e) { }
         }
     }
-    
+
 
     public static boolean registerAdmin(String firstName, String lastName, String username, String gender, String email, String address, double salary) {
         Connection conn = null;
@@ -224,7 +224,7 @@ public class AuthenticationController {
             conn = Srent_DB.getConnection();
             if (conn == null) return false;
             conn.setAutoCommit(false);
-    
+
             String checkSql = "SELECT * FROM User WHERE email = ?";
             try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
                 checkStmt.setString(1, email);
@@ -234,7 +234,7 @@ public class AuthenticationController {
                     return false;
                 }
             }
-    
+
             String insertUser = "INSERT INTO User (first_name, last_name, username, gender, email, address) VALUES (?, ?, ?, ?, ?, ?)";
             psUser = conn.prepareStatement(insertUser, Statement.RETURN_GENERATED_KEYS);
             psUser.setString(1, firstName);
@@ -244,7 +244,7 @@ public class AuthenticationController {
             psUser.setString(5, email);
             psUser.setString(6, address);
             psUser.executeUpdate();
-    
+
             rs = psUser.getGeneratedKeys();
             if (rs.next()) {
                 int userId = rs.getInt(1);
@@ -254,7 +254,7 @@ public class AuthenticationController {
                 psAdmin.setDouble(2, salary);
                 psAdmin.executeUpdate();
             }
-    
+
             conn.commit();
             return true;
         } catch (SQLException e) {
@@ -268,6 +268,6 @@ public class AuthenticationController {
             try { if (conn != null) conn.close(); } catch (Exception ignored) {}
         }
     }
-    
-    
+
+
 }

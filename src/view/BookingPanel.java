@@ -3,15 +3,14 @@ package view;
 
 import controller.BookingController;
 import controller.CarController;
-import model.Car;
-
-import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
+import javax.swing.*;
+import model.Car;
 
 /**
  * BookingPanel provides a user interface for confirming a car booking.
@@ -142,7 +141,7 @@ public class BookingPanel extends JPanel {
                 .atZone(ZoneId.systemDefault()).toLocalDate();
         String startStr = start.toString();
         String endStr   = end.toString();
-        double totalCost= Double.parseDouble(lblTotalCost.getText().replace("$", ""));
+        double totalCost= Double.parseDouble(lblTotalCost.getText().replace("$", "").replace(",", "."));
 
         boolean success = BookingController.createBooking(
                 currentUserId,

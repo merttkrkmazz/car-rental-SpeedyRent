@@ -2,12 +2,11 @@ package view;
 
 import controller.CarController;
 import controller.VehicleSpecificationController;
-import model.Car;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import model.Car;
 
 public class AdminPanel extends JPanel {
     private final CardLayout cardLayout;
@@ -38,8 +37,13 @@ public class AdminPanel extends JPanel {
 
         fuelBox = new JComboBox<>(new String[]{"Gasoline", "Diesel", "Electric", "Hybrid"});
         transBox = new JComboBox<>(new String[]{"Automatic", "Manual"});
-        colorBox = new JComboBox<>(new String[]{"Black", "White", "Red", "Blue", "Silver"});
-        statusBox = new JComboBox<>(new String[]{"available", "reserved"});
+        colorBox = new JComboBox<>(new String[]{
+            "White", "Black", "Gray", "Silver", "Blue", "Red", "Brown",
+            "Green", "Beige", "Yellow", "Orange", "Gold", "Purple",
+            "Navy", "Maroon", "Bronze", "Turquoise", "Teal"
+        });
+        
+        statusBox = new JComboBox<>(new String[]{"available", "rented","service", "retired" });
 
         // Row 0
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(new JLabel("Model:"), gbc);

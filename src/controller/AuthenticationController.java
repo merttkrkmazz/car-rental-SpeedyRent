@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import util.Srent_DB;
+import util.Session;
+
 
 public class AuthenticationController {
 
@@ -15,11 +17,8 @@ public class AuthenticationController {
         UNKNOWN
     }
 
-    /**
-     * user_id ve name ile kullanıcı girişi yapan statik metot
-     */
-    public static UserRole login(int userId, String username) {
-        String sql = "SELECT * FROM User WHERE user_id = ? AND username = ?";
+    public static UserRole login(String username, String password) {
+        String sql = "SELECT user_id FROM User WHERE username = ? AND password = ?";
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -32,29 +31,27 @@ public class AuthenticationController {
             }
 
             ps = conn.prepareStatement(sql);
-            ps.setInt(1, userId);
-            ps.setString(2, username);
+            ps.setString(1, username);
+            ps.setString(2, password);
             rs = ps.executeQuery();
 
             if (rs.next()) {
-                try {
-                    if (isAdmin(userId, conn)) {
-                        System.out.println("Admin login successful.");
-                        return UserRole.ADMIN;
-                    } else if (isCustomer(userId, conn)) {
-                        System.out.println("Customer login successful.");
-                        return UserRole.CUSTOMER;
-                    } else {
-                        System.out.println("User exists but has no role.");
-                        return UserRole.UNKNOWN;
-                    }
-                } catch (Exception roleEx) {
-                    System.err.println("Error while checking role: " + roleEx.getMessage());
-                    roleEx.printStackTrace();
+                int userId = rs.getInt("user_id");
+                Session.setCurrentUserId(userId);
+
+                if (isAdmin(userId, conn)) {
+                    System.out.println("Admin login successful.");
+                    return UserRole.ADMIN;
+                } else if (isCustomer(userId, conn)) {
+                    System.out.println("Customer login successful.");
+                    // Giriş yapan userId'yi bir yerde saklamak istersen buradan alabilirsin
+                    return UserRole.CUSTOMER;
+                } else {
+                    System.out.println("User exists but has no role.");
                     return UserRole.UNKNOWN;
                 }
             } else {
-                System.out.println("Login failed: invalid user ID or username.");
+                System.out.println("Login failed: invalid username or password.");
                 return UserRole.UNKNOWN;
             }
 
@@ -63,15 +60,10 @@ public class AuthenticationController {
             e.printStackTrace();
             return UserRole.UNKNOWN;
 
-        } catch (Exception e) {
-            System.err.println("Unexpected error during login: " + e.getMessage());
-            e.printStackTrace();
-            return UserRole.UNKNOWN;
-
         } finally {
-            try { if (rs != null) rs.close(); } catch (Exception e) { }
-            try { if (ps != null) ps.close(); } catch (Exception e) { }
-            try { if (conn != null) conn.close(); } catch (Exception e) { }
+            try { if (rs != null) rs.close(); } catch (Exception ignored) {}
+            try { if (ps != null) ps.close(); } catch (Exception ignored) {}
+            try { if (conn != null) conn.close(); } catch (Exception ignored) {}
         }
     }
 
@@ -214,7 +206,6 @@ public class AuthenticationController {
         }
     }
 
-
     public static boolean registerAdmin(String firstName, String lastName, String username, String gender, String email, String address, double salary) {
         Connection conn = null;
         PreparedStatement psUser = null;
@@ -268,6 +259,5 @@ public class AuthenticationController {
             try { if (conn != null) conn.close(); } catch (Exception ignored) {}
         }
     }
-
 
 }

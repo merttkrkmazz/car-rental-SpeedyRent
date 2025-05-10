@@ -27,7 +27,7 @@ public class CarFilterManager {
 
     public List<Car> filterAvailableCars() {
         return carDAO.getAllCars().stream()
-                .filter(Car::isAvailable)
+                .filter(car -> car.getStatus().equalsIgnoreCase("available"))
                 .collect(Collectors.toList());
     }
 }

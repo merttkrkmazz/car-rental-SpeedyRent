@@ -1,135 +1,98 @@
--- Önce ilişki (bridge) tabloları silinir
-DROP TABLE IF EXISTS reserves;
-DROP TABLE IF EXISTS makes;
-DROP TABLE IF EXISTS brings;
-DROP TABLE IF EXISTS has;
-DROP TABLE IF EXISTS manages;
+-- Veritabanı oluşturma
+DROP DATABASE IF EXISTS srent;
+CREATE DATABASE srent;
+USE srent;
 
--- Ardından ana tablolar (bağımlı olanlar)
-DROP TABLE IF EXISTS Booking;
-DROP TABLE IF EXISTS Car;
-DROP TABLE IF EXISTS VehicleSpecification;
-DROP TABLE IF EXISTS Card;
-DROP TABLE IF EXISTS Admin;
-DROP TABLE IF EXISTS Customer;
-DROP TABLE IF EXISTS User;
+-- Kullanıcılar
+CREATE TABLE user (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50),
+    password VARCHAR(50)
+);
 
-
-/* ---------- base user ---------- */
-DROP TABLE IF EXISTS User;
-
-CREATE TABLE User (
-    user_id       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    first_name    VARCHAR(30),
-    last_name     VARCHAR(30),
-    username      VARCHAR(30) UNIQUE,
-    gender        ENUM('F','M','X') DEFAULT NULL,
-    email         VARCHAR(120) UNIQUE,
-    address       VARCHAR(150),
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
-
-
-/* ---- role-specific sub-tables (ISA) ---------------------- */
+-- Admin
 CREATE TABLE Admin (
-    user_id  INT UNSIGNED PRIMARY KEY,
-    -- optional extra admin fields (e.g. salary)
-    salary   DECIMAL(8,2) DEFAULT NULL,
-    CONSTRAINT fk_admin_user
-      FOREIGN KEY (user_id) REFERENCES User(user_id)
-      ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+    user_id INT PRIMARY KEY,
+    salary DOUBLE,
+    FOREIGN KEY (user_id) REFERENCES user(user_id)
+);
 
+-- Customer
 CREATE TABLE Customer (
-    user_id     INT UNSIGNED PRIMARY KEY,
-    occupation  VARCHAR(60),
-    CONSTRAINT fk_cust_user
-      FOREIGN KEY (user_id) REFERENCES User(user_id)
-      ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+    user_id INT PRIMARY KEY,
+    occupation VARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES user(user_id)
+);
 
+-- Kart bilgisi (zorunlu değil ama 2'de vardı)
 CREATE TABLE Card (
-    card_id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    card_brand    ENUM('Visa','Mastercard','Maestro','Troy','Other'),
-    card_number  CHAR(16),
-    exp_date     DATE,
+    card_id INT AUTO_INCREMENT PRIMARY KEY,
+    card_brand ENUM('Visa','Mastercard','Maestro','Troy','Other'),
+    card_number CHAR(16),
+    exp_date DATE,
     name_on_card VARCHAR(60)
-) ENGINE=InnoDB;
+);
 
-CREATE TABLE Car (
-    car_id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    model          VARCHAR(40),
-    daily_rent     DECIMAL(8,2),
-    deposit        DECIMAL(8,2),
-    mileage        INT UNSIGNED,
-    vehicle_status ENUM('available','rented','service','retired') DEFAULT 'available'
-) ENGINE=InnoDB;
-
+-- Teknik Özellikler
 CREATE TABLE VehicleSpecification (
-    specification_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    color            VARCHAR(20),
-    fuel_type        ENUM('petrol','diesel','hybrid','gasoline'),
-    transmission_type ENUM('automatic','manual'),
-    seating_capacity TINYINT UNSIGNED
-) ENGINE=InnoDB;
+    specification_id INT AUTO_INCREMENT PRIMARY KEY,
+    color VARCHAR(20),
+    fuel_type VARCHAR(20),
+    transmission_type VARCHAR(20),
+    seating_capacity INT
+);
 
-CREATE TABLE Booking (
-    booking_id     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    start_date     DATE,
-    end_date       DATE,
-    booking_status ENUM('pending','confirmed','finished','cancelled') DEFAULT 'pending',
-    secure_deposit DECIMAL(8,2),
-    amount         DECIMAL(8,2),
-    drive_option   ENUM('self','chauffeur') DEFAULT 'self',
-    reading    INT UNSIGNED,
-    date_out       DATE
-) ENGINE=InnoDB;
+-- Araçlar
+CREATE TABLE Car (
+    car_id INT AUTO_INCREMENT PRIMARY KEY,
+    model VARCHAR(50),
+    daily_rent DOUBLE,
+    deposit DOUBLE,
+    mileage INT,
+    vehicle_status VARCHAR(20)
+);
 
-/* =========================================================
-   B.  RELATION (BRIDGE) TABLES — all links set to M:N
-   =========================================================*/
-
-/* Admin  M:N  Car  */
-CREATE TABLE manages (
-    user_id INT UNSIGNED,
-    car_id   INT UNSIGNED,
-    PRIMARY KEY (user_id, car_id),
-    FOREIGN KEY (user_id) REFERENCES Admin(user_id)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (car_id)   REFERENCES Car(car_id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
-
-/* Car  M:N  VehicleSpecification */
+-- has ilişkisi
 CREATE TABLE has (
-    car_id  INT UNSIGNED,
-    specification_id INT UNSIGNED,
-    PRIMARY KEY (car_id, specification_id),
-    FOREIGN KEY (car_id)           REFERENCES Car(car_id)
-        ON DELETE CASCADE ON UPDATE CASCADE,
+    car_id INT,
+    specification_id INT,
+    FOREIGN KEY (car_id) REFERENCES Car(car_id),
     FOREIGN KEY (specification_id) REFERENCES VehicleSpecification(specification_id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+);
 
+-- manages ilişkisi
+CREATE TABLE manages (
+    user_id INT,
+    car_id INT,
+    FOREIGN KEY (car_id) REFERENCES Car(car_id)
+);
 
-/* User(Customer)  M:N  Booking */
+-- Rezervasyonlar
+CREATE TABLE Booking (
+    booking_id INT AUTO_INCREMENT PRIMARY KEY,
+    start_date DATE,
+    end_date DATE,
+    booking_status VARCHAR(20),
+    secure_deposit DOUBLE, -- booking için gerekli
+    amount DOUBLE,
+    drive_option ENUM('self','chauffeur') DEFAULT 'self',
+    reading INT,
+    date_out DATE
+);
+
+-- makes ilişkisi (kullanıcı ile booking arasında)
 CREATE TABLE makes (
-    user_id    INT UNSIGNED,
-    booking_id INT UNSIGNED,
+    user_id INT,
+    booking_id INT,
     PRIMARY KEY (user_id, booking_id),
-    FOREIGN KEY (user_id)    REFERENCES User(user_id)
-        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(user_id),
     FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+);
 
-/* Booking  M:N  Car */
+-- reserves ilişkisi
 CREATE TABLE reserves (
-    booking_id INT UNSIGNED,
-    car_id     INT UNSIGNED,
-    PRIMARY KEY (booking_id, car_id),
-    FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (car_id)     REFERENCES Car(car_id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+    booking_id INT,
+    car_id INT,
+    FOREIGN KEY (booking_id) REFERENCES Booking(booking_id),
+    FOREIGN KEY (car_id) REFERENCES Car(car_id)
+);B;

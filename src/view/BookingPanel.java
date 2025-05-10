@@ -156,6 +156,9 @@ public class BookingPanel extends JPanel {
                 startStr      // date out
         );
         if (success) {
+            // Car status become "reserved"
+            CarController.updateCar(selectedCar.getId(), selectedCar.getModel(), selectedCar.getRentalPrice(), "reserved");
+
             JOptionPane.showMessageDialog(this,
                 "Booking confirmed!\nTotal: " + lblTotalCost.getText(),
                 "Success", JOptionPane.INFORMATION_MESSAGE);

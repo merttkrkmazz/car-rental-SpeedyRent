@@ -1,7 +1,7 @@
 package model;
 
 /**
- * Araç model sınıfı.
+ * Car model class.
  */
 public class Car {
     private int id;
@@ -12,12 +12,9 @@ public class Car {
     private String transmission;
     private int seatingCapacity;
     private double rentalPrice;
-    private boolean availability;
+    private String status; // "available", "reserved", etc.
 
-    /**
-     * Car constructor.
-     */
-    public Car(int id, String brand, String model, String color, String fuelType, String transmission, int seatingCapacity, double rentalPrice, boolean availability) {
+    public Car(int id, String brand, String model, String color, String fuelType, String transmission, int seatingCapacity, double rentalPrice, String status) {
         this.id = id;
         this.brand = brand;
         this.model = model;
@@ -26,7 +23,7 @@ public class Car {
         this.transmission = transmission;
         this.seatingCapacity = seatingCapacity;
         this.rentalPrice = rentalPrice;
-        this.availability = availability;
+        this.status = status;
     }
 
     public int getId() { return id; }
@@ -37,5 +34,5 @@ public class Car {
     public String getTransmission() { return transmission; }
     public int getSeatingCapacity() { return seatingCapacity; }
     public double getRentalPrice() { return rentalPrice; }
-    public boolean isAvailable() { return availability; }
+    public String getStatus() { return status; }
 }

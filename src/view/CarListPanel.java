@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import util.Session;
 import java.util.stream.Collectors;
 
 public class CarListPanel extends JPanel {
@@ -24,10 +25,10 @@ public class CarListPanel extends JPanel {
 
     private List<Car> allCars;
 
-    public CarListPanel(CardLayout cardLayout, JPanel container, int currentUserId) {
+    public CarListPanel(CardLayout cardLayout, JPanel container) {
         this.cardLayout = cardLayout;
         this.container = container;
-        this.currentUserId  = currentUserId;
+        this.currentUserId  = Session.getCurrentUserId();
         setLayout(new BorderLayout());
 
         // === Top Filter Panel ===
@@ -191,7 +192,7 @@ public class CarListPanel extends JPanel {
         Car selected = allCars.stream().filter(c -> c.getId() == carId).findFirst().orElse(null);
 
         if (selected != null) {
-            BookingPanel bookingPanel = new BookingPanel(cardLayout, container, selected, currentUserId);
+            BookingPanel bookingPanel = new BookingPanel(cardLayout, container, selected);
             container.add(bookingPanel, "booking");
             cardLayout.show(container, "booking");
         }

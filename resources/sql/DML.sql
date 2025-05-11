@@ -79,11 +79,11 @@ VALUES
 /* ---------- INSERT sample cars ---------- */
 INSERT INTO car (model, daily_rent, deposit, mileage, vehicle_status)
 VALUES
-  ('Peugeot 208 1.2 PureTech',     36.00, 350.00, 58700, 'available'),
-  ('Volkswagen Passat 1.5 TSI',    62.00, 600.00, 42300, 'available'),
+  ('Peugeot 208 1.2 PureTech',     36.00, 350.00, 58700, 'rented'),
+  ('Volkswagen Passat 1.5 TSI',    62.00, 600.00, 42300, 'rented'),
   ('Hyundai Tucson 1.6',           73.00, 700.00, 47800, 'rented'),
-  ('Citroën C4 Cactus 1.2',        41.00, 400.00, 51200, 'available'),
-  ('Toyota Camry 2.5 Hybrid',      92.00, 850.00, 28900, 'available'),
+  ('Citroën C4 Cactus 1.2',        41.00, 400.00, 51200, 'rented'),
+  ('Toyota Camry 2.5 Hybrid',      92.00, 850.00, 28900, 'rented'),
   ('Honda Jazz 1.3 i-VTEC',        39.00, 350.00, 68300, 'available'),
   ('Ford Kuga 1.5 EcoBoost',       70.00, 680.00, 40100, 'service'),
   ('Renault Megane 1.3 TCe',       49.00, 500.00, 37600, 'available'),
@@ -124,5 +124,33 @@ VALUES
   (19, 19),  (20, 20),  (21, 21),  (22, 22),  (23, 23),  (24, 24),
   (25, 25),  (26, 26),  (27, 27),  (28, 28),  (29, 29),  (30, 30),
   (31, 31),  (32, 32),  (33, 33),  (34, 34);
+  
+  
+INSERT INTO Booking (start_date, end_date, booking_status, secure_deposit, amount, drive_option, reading, date_out)
+VALUES
+  ('2025-05-01', '2025-05-03', 'confirmed', 350.00, 108.00, 'self',     58700, '2025-05-01'),  -- booking_id = 1
+  ('2025-05-04', '2025-05-07', 'confirmed', 600.00, 248.00, 'self',     42300, '2025-05-04'),  -- booking_id = 2
+  ('2025-05-02', '2025-05-05', 'confirmed', 700.00, 219.00, 'chauffeur',47800, '2025-05-02'),  -- booking_id = 3
+  ('2025-05-06', '2025-05-08', 'confirmed', 400.00, 123.00, 'self',     51200, '2025-05-06'),  -- booking_id = 4
+  ('2025-05-10', '2025-05-12', 'confirmed', 850.00, 276.00, 'self',     28900, '2025-05-10');  -- booking_id = 5
+
+
+INSERT INTO makes (user_id, booking_id)
+VALUES
+  (2, 1),
+  (4, 2),
+  (5, 3),
+  (6, 4),
+  (7, 5);
+
+
+INSERT INTO reserves (booking_id, car_id)
+VALUES
+  (1, 1),
+  (2, 2),
+  (3, 3),
+  (4, 4),
+  (5, 5);
+
 
 

@@ -18,9 +18,9 @@ The system enables users to search available cars, make reservations, and manage
 - SRS Documentation for requirements specification  
 
 📂 Project Structure  
-/src            → Java source code
-/resources/sql  → Database scripts
-/lib            → External libraries
+- /src            → Java source code
+- /resources/sql  → Database scripts
+- /lib            → External libraries
 
 🚀 How to Run  
 1. Clone the repository  
@@ -34,7 +34,8 @@ The system enables users to search available cars, make reservations, and manage
 This project was developed collaboratively as part of a software engineering course.
 
 My Contributions:
-	•	💻 Built backend services in Java for car catalog, booking, and user authentication
-	•	🗄️ Designed relational database schema and SQL scripts
-	•	📊 Created UML diagrams and contributed to requirements documentation (SRS)
+-	💻 Built backend services in Java for car catalog, booking, and user authentication
+-	🗄️ Designed relational database schema and SQL scripts
+-   📊 Created UML diagrams and contributed to requirements documentation (SRS)
+
 
